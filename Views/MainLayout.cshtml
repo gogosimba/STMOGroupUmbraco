@@ -1,0 +1,59 @@
+﻿@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Name | SmartOptics Clone</title>
+    <style>
+        :root {
+            --so-blue: #005bb7;
+            --so-dark: #1a1a1a;
+            --so-grey: #f4f4f4;
+        }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; color: var(--so-dark); line-height: 1.6; }
+        header { background: white; border-bottom: 1px solid #eee; padding: 20px 0; position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: bold; font-size: 1.5rem; color: var(--so-blue); text-decoration: none; text-transform: uppercase; }
+        .nav-links { list-style: none; display: flex; gap: 30px; margin: 0; }
+        .nav-links a { text-decoration: none; color: var(--so-dark); font-weight: 500; font-size: 0.9rem; }
+        .nav-links a:hover { color: var(--so-blue); }
+        .hero { padding: 80px 0; background-color: white; }
+        footer { background: var(--so-grey); padding: 40px 0; margin-top: 60px; font-size: 0.8rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo">UmbrellaCorp</a>
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    @foreach (var item in Model.Root().Children().Where(x => x.IsVisible()))
+                    {
+                        <li><a href="@item.Url()">@item.Name</a></li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year UmbrellaCorp - TechDemo</p>
+        </div>
+    </footer>
+
+</body>
+</html>

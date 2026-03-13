@@ -1,0 +1,14 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.StandardPage>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+    Layout = "MainLayout.cshtml";
+}
+
+<div class="container" style="padding: 60px 0;">
+    <h1>@Model.HeroTitle</h1>
+    <hr style="border: 0; border-top: 2px solid var(--so-blue); width: 50px; margin: 20px 0;" />
+    <div>
+        @Model.HeroBody
+    </div>
+</div>
