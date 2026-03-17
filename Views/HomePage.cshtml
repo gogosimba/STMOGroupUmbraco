@@ -1,6 +1,5 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.HomePage>
-@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
 @{
     Layout = "MainLayout.cshtml";
 }
@@ -8,8 +7,14 @@
 <section class="hero">
     <div class="container">
         <h1 style="font-size: 3.5rem; margin-bottom: 20px;">@Model.HeroTitle</h1>
-        <div style="font-size: 1.2rem; color: #666;">
-            @Model.MainBody
-        </div>
+        @{
+            var img = Model.Value<IPublishedContent>("heroImage");
+            if (img != null)
+            {
+                <img src="@img.Url()" style="max-width: 100%; margin-top:30px; border-radius:8px;" alt="@Model.HeroTitle" />
+            }
+        }
+
+  
     </div>
 </section>

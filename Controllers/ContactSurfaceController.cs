@@ -26,7 +26,7 @@ namespace UmbracoSetup_STMOGROUP.Controllers
                 return CurrentUmbracoPage();
             }
 
-            // Här skulle man normalt skicka mejl eller spara i databas
+       
             TempData["Success"] = true;
             return RedirectToCurrentUmbracoPage();
         }
