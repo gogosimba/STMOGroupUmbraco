@@ -1,88 +1,172 @@
-﻿@using Umbraco.Extensions
+@using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@Model.Name | UmbrellaCorp</title>
+    <title>@Model.Name | Optics Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --so-blue: #005bb7;
-            --so-dark: #1a1a1a;
-            --so-grey: #f4f4f4;
+            --so-blue: #0077cc;
+            --so-blue-hover: #0090f0;
+            --so-dark: #0d0d0d;
+            --so-dark-2: #141414;
+            --so-dark-3: #1a1a1a;
+            --so-header: rgba(13,13,13,0.92);
+            --so-text: #e8e8e8;
+            --so-text-muted: #888;
+            --so-border: rgba(255,255,255,0.07);
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
-            color: var(--so-dark);
+            color: var(--so-text);
             line-height: 1.6;
+            background-color: var(--so-dark);
         }
 
+        /* ── HEADER ── */
         header {
-            background: white;
-            border-bottom: 1px solid #eee;
-            padding: 20px 0;
-            position: sticky;
+            background: var(--so-header);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0;
+            border-bottom: 1px solid var(--so-border);
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
-        .container {
-            max-width: 1100px;
+        .nav-inner {
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        nav {
+            padding: 0 40px;
+            height: 64px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: var(--so-blue);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
             text-decoration: none;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .nav-links {
-            list-style: none;
             display: flex;
-            gap: 30px;
+            list-style: none;
+            gap: 40px;
             margin: 0;
+            padding: 0;
         }
 
-            .nav-links a {
-                text-decoration: none;
-                color: var(--so-dark);
-                font-weight: 500;
-                font-size: 0.9rem;
-            }
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.65);
+            font-weight: 500;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: color 0.25s;
+        }
 
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        /* ── SHARED CONTAINER ── */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            display: inline-block;
+            background: var(--so-blue);
+            color: #fff;
+            padding: 13px 32px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: background 0.25s, transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--so-blue-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: border-color 0.25s, background 0.25s;
+        }
+
+        .btn-outline:hover {
+            border-color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* ── SCROLL REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.75s ease-out, transform 0.75s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── FOOTER ── */
         footer {
-            background: var(--so-grey);
+            background: #080808;
+            border-top: 1px solid var(--so-border);
             padding: 40px 0;
-            margin-top: 60px;
-            font-size: 0.8rem;
             text-align: center;
+            color: var(--so-text-muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
+        <div class="nav-inner">
+            <a href="/" class="logo">Optics<span style="color:var(--so-blue)">Solutions</span></a>
             <nav>
-                <a href="/" class="logo">UmbrellaCorp</a>
                 <ul class="nav-links">
-                    <li><a href="/">Home</a></li>
+                    <li><a href="/">Hem</a></li>
                     @foreach (var item in Model.Root().Children().Where(x => x.IsVisible()))
                     {
                         <li><a href="@item.Url()">@item.Name</a></li>
@@ -95,13 +179,19 @@
     <main>@RenderBody()</main>
 
     <footer>
-        <div class="container">
-            <p>&copy; @DateTime.Now.Year UmbrellaCorp - TechDemo</p>
-        </div>
+        <p>&copy; @DateTime.Now.Year Optics Solutions</p>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    </script>
 </body>
 </html>

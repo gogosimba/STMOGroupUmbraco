@@ -66,6 +66,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual string FeatureTitle => this.Value<string>(_publishedValueFallback, "featureTitle");
 
 		///<summary>
+		/// Hero Body
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "12.3.10+d8df405")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("heroBody")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString HeroBody => this.Value<global::Umbraco.Cms.Core.Strings.IHtmlEncodedString>(_publishedValueFallback, "heroBody");
+
+		///<summary>
 		/// Hero Image
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "12.3.10+d8df405")]
@@ -80,13 +88,5 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("heroTitle")]
 		public virtual string HeroTitle => this.Value<string>(_publishedValueFallback, "heroTitle");
-
-		///<summary>
-		/// Main Body
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "12.3.10+d8df405")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("mainBody")]
-		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString MainBody => this.Value<global::Umbraco.Cms.Core.Strings.IHtmlEncodedString>(_publishedValueFallback, "mainBody");
 	}
 }

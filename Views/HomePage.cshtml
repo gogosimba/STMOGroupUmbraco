@@ -1,20 +1,430 @@
-﻿@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.HomePage>
 @{
     Layout = "MainLayout.cshtml";
 }
 
-<section class="hero">
-    <div class="container">
-        <h1 style="font-size: 3.5rem; margin-bottom: 20px;">@Model.HeroTitle</h1>
-        @{
-            var img = Model.Value<IPublishedContent>("heroImage");
-            if (img != null)
-            {
-                <img src="@img.Url()" style="max-width: 100%; margin-top:30px; border-radius:8px;" alt="@Model.HeroTitle" />
-            }
-        }
+<style>
+    /* ── HERO ── */
+    .hero {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        background: #08111a; /* fallback while image loads */
+    }
 
-  
+    .hero-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        z-index: 0;
+    }
+
+    /* Multi-layer overlay: dark left edge (for text legibility) + overall darkening */
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background:
+            linear-gradient(to right, rgba(8,10,14,0.92) 0%, rgba(8,10,14,0.6) 55%, rgba(8,10,14,0.2) 100%),
+            linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 640px;
+        padding-top: 64px; /* compensate fixed nav */
+    }
+
+    .hero-eyebrow {
+        display: inline-block;
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--so-blue);
+        margin-bottom: 20px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2.2rem, 4vw, 3.8rem);
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        margin: 0 0 24px;
+    }
+
+    .hero-content h1 em {
+        font-style: normal;
+        color: var(--so-blue);
+    }
+
+    .hero-body {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.65);
+        font-weight: 300;
+        margin-bottom: 40px;
+        max-width: 480px;
+        line-height: 1.7;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    /* ── BUSINESS AREAS ── */
+    .section-areas {
+        padding: 110px 0;
+        background: #0d0d0d;
+        border-top: 1px solid var(--so-border);
+        border-bottom: 1px solid var(--so-border);
+    }
+
+    .section-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--so-blue);
+        display: block;
+        margin-bottom: 14px;
+    }
+
+    .section-title {
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 60px;
+        letter-spacing: -0.5px;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1px; /* gap via background, giving a "joined" panel look */
+        background: var(--so-border);
+        border: 1px solid var(--so-border);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .card {
+        background: #111;
+        padding: 48px 40px;
+        transition: background 0.3s;
+    }
+
+    .card:hover {
+        background: #161b24;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 24px;
+        color: var(--so-blue);
+    }
+
+    .card h3 {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #fff;
+        margin: 0 0 14px;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+        color: var(--so-text-muted);
+        margin: 0;
+        line-height: 1.7;
+    }
+
+    /* ── INNOVATION SPLIT ── */
+    .section-innovation {
+        padding: 120px 0;
+        background: #0a0a0a;
+        border-bottom: 1px solid var(--so-border);
+    }
+
+    .split-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+    }
+
+   
+
+    .split-text .section-label { margin-bottom: 12px; }
+
+    .split-text h2 {
+        font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 20px;
+        letter-spacing: -0.5px;
+    }
+
+    .split-text p {
+        font-size: 0.95rem;
+        color: var(--so-text-muted);
+        line-height: 1.8;
+        margin: 0 0 36px;
+    }
+
+    .split-visual {
+        position: relative;
+        aspect-ratio: 4/3;
+        border-radius: 3px;
+        overflow: hidden;
+        background: #141414;
+        border: 1px solid var(--so-border);
+    }
+
+    .split-visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Placeholder when no image is set */
+    .visual-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        color: #333;
+    }
+
+    .visual-placeholder svg { width: 48px; height: 48px; color: #2a2a2a; }
+
+    .visual-placeholder span {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: #2a2a2a;
+    }
+
+    /* ── STATS BAR ── */
+    .section-stats {
+        padding: 70px 0;
+        background: #0d0d0d;
+        border-bottom: 1px solid var(--so-border);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--so-border);
+        border: 1px solid var(--so-border);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+
+
+    .stat-item {
+        background: #111;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -2px;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .stat-number span { color: var(--so-blue); }
+
+    .stat-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--so-text-muted);
+    }
+
+    /* ── CTA ── */
+    .section-cta {
+        padding: 120px 0;
+        text-align: center;
+        background: linear-gradient(135deg, #05111f 0%, #0d0d0d 100%);
+        border-bottom: 1px solid var(--so-border);
+    }
+
+    .section-cta h2 {
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 18px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-cta p {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.55);
+        margin: 0 auto 44px;
+        max-width: 480px;
+        line-height: 1.7;
+    }
+</style>
+
+@* ── 1. HERO ── *@
+<section class="hero">
+    @{
+        var img = Model.Value<IPublishedContent>("heroImage");
+    }
+
+    @if (img != null)
+    {
+        <img class="hero-bg" src="@img.Url()" alt="Hero" />
+    }
+    else
+    {
+        @* Animated fallback gradient — looks intentional when no image is set *@
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#050d17 0%,#0a1929 50%,#061120 100%);z-index:0;"></div>
+    }
+
+    <div class="hero-overlay"></div>
+
+    <div class="container">
+        <div class="hero-content reveal">
+            <span class="hero-eyebrow">Precisionsteknologi</span>
+            <h1>@Model.HeroTitle</h1>
+            <div class="hero-body">@Model.HeroBody</div>
+            <div class="hero-cta">
+                <a href="/about-us" class="btn-primary">Utforska lösningar</a>
+                <a href="/about-us" class="btn-outline">Kontakta oss</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── 2. BUSINESS AREAS ── *@
+<section class="section-areas">
+    <div class="container">
+        <span class="section-label reveal">Vad vi gör</span>
+        <h2 class="section-title reveal">Våra affärsområden</h2>
+
+        <div class="cards-grid">
+
+            @* Card 1 – Medicinteknik *@
+            <div class="card reveal">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 7v5l3 3"/>
+                    <path d="M9 3.5A9 9 0 0 1 21 12"/>
+                </svg>
+                <h3>Medicinteknik</h3>
+                <p>Högprecisionsoptik för kirurgiska instrument och diagnostik.</p>
+            </div>
+
+            @* Card 2 – Industriell Automation *@
+            <div class="card reveal">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="2" y="7" width="6" height="10" rx="1"/>
+                    <rect x="9" y="4" width="6" height="13" rx="1"/>
+                    <rect x="16" y="9" width="6" height="8" rx="1"/>
+                    <line x1="2" y1="21" x2="22" y2="21"/>
+                </svg>
+                <h3>Industriell Automation</h3>
+                <p>Sensorsystem och visionslösningar för automatiserad tillverkning.</p>
+            </div>
+
+            @* Card 3 – Flyg & Rymd *@
+            <div class="card reveal">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2L8 8H2l4 4-2 8 8-4 8 4-2-8 4-4h-6z"/>
+                </svg>
+                <h3>Flyg &amp; Rymd</h3>
+                <p>Robust optik designad för extrema miljöer och maximal tillförlitlighet.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@* ── 3. STATS ── *@
+<section class="section-stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item reveal">
+                <div class="stat-number">20<span>+</span></div>
+                <div class="stat-label">Års erfarenhet</div>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-number">400<span>+</span></div>
+                <div class="stat-label">Kunder globalt</div>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-number">99<span>%</span></div>
+                <div class="stat-label">Kundnöjdhet</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── 4. INNOVATION SPLIT ── *@
+<section class="section-innovation">
+    <div class="container">
+        <div class="split-layout">
+            <div class="split-text reveal">
+                <span class="section-label">Om oss</span>
+                <h2>Innovation i fokus</h2>
+                <p>
+                    På Optics Solutions kombinerar vi decennier av erfarenhet med den senaste tekniken inom fotonik.
+                    Vårt team av experter arbetar nära våra kunder för att utveckla skräddarsydda lösningar.
+                </p>
+                <a href="/about-us" class="btn-outline">Läs mer om oss</a>
+            </div>
+            <div class="split-visual reveal">
+                @{
+                    var showcaseImg = Model.Value<IPublishedContent>("showcaseImage");
+                }
+                @if (showcaseImg != null)
+                {
+                    <img src="@showcaseImg.Url()" alt="Product showcase" />
+                }
+                else
+                {
+                    <div class="visual-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                        </svg>
+                        <span>Product Showcase</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── 5. CTA ── *@
+<section class="section-cta">
+    <div class="container reveal">
+        <h2>Redo att starta ditt projekt?</h2>
+        <p>Kontakta våra experter idag för en kostnadsfri konsultation.</p>
+        <a href="/about-us" class="btn-primary">Kontakta oss nu</a>
     </div>
 </section>
